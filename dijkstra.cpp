@@ -1,82 +1,43 @@
-#include <bits/stdc++.h>
+import math
+#For INF
+def dijkstra(graph, n, src):
+    distance = [math.inf] * n
+    distance[src] = 0
+    final_selected = [(src, distance[src])]
+    curr_vertex = src
 
-using namespace std;
+    while len(final_selected) < n:
+        min_vertex, min_dist = -1, math.inf
+        for neighbor in graph[curr_vertex]:
+            vertex, weight = neighbor
+            distance[vertex] = min(
+                distance[curr_vertex] + weight, distance[vertex])
 
-#define V 4
+        for vertex in range(n):
+            if distance[vertex] <= min_dist and (vertex, distance[vertex]) not in final_selected:
+                min_vertex, min_dist = vertex, distance[vertex]
 
-int minDistance(int dist[], bool sptSet[]) {
-    int min = 9999, min_index;
+        final_selected.append((min_vertex, min_dist))
+        curr_vertex = min_vertex
 
-    for (int v = 0; v < V; v++)
-        if (sptSet[v] == false && dist[v] <= min)
-            min = dist[v], min_index = v;
-
-    return min_index;
-}
-
-void printPath(int parent[], int j) {
-    if (parent[j] == -1)
-        return;
-
-    printPath(parent, parent[j]);
-
-    cout << j << " ";
-}
-
-void printSolution(int dist[], int n, int parent[]) {
-    int src = 0;
-    cout << "Vertex\t Distance\tPath" << endl;
-    for (int i = 1; i < V; i++) {
-        cout << "\n"
-             << src << " -> " << i << " \t \t" << dist[i] << "\t\t" << src << " ";
-        printPath(parent, i);
-    }
-}
-
-void dijkstra(int graph[V][V], int src) {
-    int dist[V];
-
-    bool sptSet[V];
-
-    int parent[V];
-
-    for (int i = 0; i < V; i++) {
-        parent[i] = -1;
-        dist[i] = 9999;
-        sptSet[i] = false;
-    }
-
-    dist[src] = 0;
-
-    for (int count = 0; count < V - 1; count++) {
-        int u = minDistance(dist, sptSet);
-
-        sptSet[u] = true;
-
-        for (int v = 0; v < V; v++)
-
-            if (!sptSet[v] && graph[u][v] &&
-                dist[u] + graph[u][v] < dist[v]) {
-                parent[v] = u;
-                dist[v] = dist[u] + graph[u][v];
-            }
-    }
-
-    printSolution(dist, V, parent);
-}
-
-int main() {
-    int graph[V][V];
-    cout << "Distance Matrix (" << V << "x" << V << ", max distance/infinity is 99): " << endl;
-    for (int i = 0; i < V; i++) {
-        for (int j = 0; j < V; j++)
-            cin >> graph[i][j];
-    }
-    cout << "Enter the source vertex: (0-" << V - 1 << ")" << endl;
-    int src;
-    cin >> src;
-
-    dijkstra(graph, src);
-    cout << endl;
-    return 0;
-}
+    print('Vertex\tDistance')
+    [print(f'{v}\t{d}') for v, d in final_selected]
+if __name__ == "__main__":
+    n = int(input("Enter no of vertices: "))
+    e = int(input("Enter no of edges: "))
+    graph_dict = {}
+    print("Enter the edges as follows: [start] [end] [weight]")
+    for i in range(e):
+        start, end, weight = [int(j) for j in input().split()]
+        if not graph_dict.get(start):
+            graph_dict[start] = [(end, weight)]
+        else:
+            graph_dict[start].append((end, weight))
+    
+        if not graph_dict.get(end):
+            graph_dict[end] = [(start, weight)]
+        else:
+            graph_dict[end].append((start, weight))
+    for i in range(n):
+        print(f'Source {i}: ')
+        dijkstra(graph_dict, n, i)
